@@ -10,7 +10,7 @@ import UIKit
 
 class ToDoListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    let itemArray = ["Milk", "Potatoes", "Water"]
+    var itemArray = ["Milk", "Potatoes", "Water"]
     
     @IBOutlet weak var todoTable: UITableView!
     
@@ -21,7 +21,7 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
         todoTable.delegate = self
         todoTable.dataSource = self
     }
-//MARK: - tableView data source methods
+//MARK: - tableView DataSsource methods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
     }
@@ -30,6 +30,18 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
         let cell = tableView.dequeueReusableCell(withIdentifier: "itemCell", for: indexPath)
         cell.textLabel?.text = itemArray[indexPath.row]
         return cell
+    }
+    
+  //MARK: - tableView Delegate methods
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        itemArray.remove(at: indexPath.row)
+//        todoTable.reloadData()
+        tableView.cellForRow(at: indexPath)?.accessoryType = (tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none) ? .checkmark : .none
+
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        
     }
 }
 

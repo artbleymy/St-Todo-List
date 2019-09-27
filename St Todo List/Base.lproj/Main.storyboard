@@ -7,7 +7,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--To Do List View Controller-->
+        <!--St Todo List-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ToDoListViewController" customModule="St_Todo_List" customModuleProvider="target" sceneMemberID="viewController">
@@ -39,7 +39,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" id="7r7-Zw-WwI"/>
+                    <navigationItem key="navigationItem" title="St Todo List" id="7r7-Zw-WwI"/>
                     <connections>
                         <outlet property="todoTable" destination="hbL-j7-lfX" id="Y8y-FK-lEk"/>
                     </connections>
