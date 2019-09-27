@@ -14,6 +14,32 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
     
     @IBOutlet weak var todoTable: UITableView!
     
+    //MARK: - IBActions
+    @IBAction func clickAddButton(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField()
+
+        let alert = UIAlertController(title: "Add new item", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add item", style: .default) { (action) in
+            //what will happen
+            guard let newItem = textField.text else { return }
+            if newItem.count > 0 {
+                self.itemArray.append(newItem)
+                self.todoTable.reloadData()
+            }
+        }
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+ 
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+        
+    }
+    
+    
 //MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -39,7 +39,13 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" title="St Todo List" id="7r7-Zw-WwI"/>
+                    <navigationItem key="navigationItem" title="St Todo List" id="7r7-Zw-WwI">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Uwt-g9-01u">
+                            <connections>
+                                <action selector="clickAddButton:" destination="BYZ-38-t0r" id="YuI-VJ-CFr"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="todoTable" destination="hbL-j7-lfX" id="Y8y-FK-lEk"/>
                     </connections>
