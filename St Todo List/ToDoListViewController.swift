@@ -12,6 +12,8 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
     
     var itemArray = ["Milk", "Potatoes", "Water"]
     
+    let defaults = UserDefaults.standard
+    
     @IBOutlet weak var todoTable: UITableView!
     
     //MARK: - IBActions
@@ -25,6 +27,9 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
             guard let newItem = textField.text else { return }
             if newItem.count > 0 {
                 self.itemArray.append(newItem)
+                
+                self.defaults.set(self.itemArray, forKey: "TodoListArray")
+                
                 self.todoTable.reloadData()
             }
         }
@@ -46,6 +51,9 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
         // Do any additional setup after loading the view.
         todoTable.delegate = self
         todoTable.dataSource = self
+        
+        //First - use user defaults and load data from them
+        loadDataFromUserDefaults()
     }
 //MARK: - tableView DataSsource methods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -60,14 +68,16 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
     
   //MARK: - tableView Delegate methods
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        itemArray.remove(at: indexPath.row)
-//        todoTable.reloadData()
-        tableView.cellForRow(at: indexPath)?.accessoryType = (tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none) ? .checkmark : .none
 
-        
+        tableView.cellForRow(at: indexPath)?.accessoryType = (tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none) ? .checkmark : .none
         tableView.deselectRow(at: indexPath, animated: true)
         
-        
+    }
+    
+    //MARK: - Load data from user defaults
+    private func loadDataFromUserDefaults(){
+        guard let loadedData = defaults.array(forKey: "TodoListArray") as? [String] else { return }
+        itemArray = loadedData
     }
 }
 
