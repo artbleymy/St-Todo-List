@@ -11,9 +11,8 @@ import UIKit
 class ToDoListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var itemArray = [Item]()
-    
-    let defaults = UserDefaults.standard
-    
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+
     @IBOutlet weak var todoTable: UITableView!
     
     //MARK: - IBActions
@@ -28,10 +27,9 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
             if newItemName.count > 0 {
                 let newItem = Item(name: newItemName, checked: false)
                 self.itemArray.append(newItem)
-
-//                self.defaults.set(self.itemArray, forKey: "TodoListArray")
-
-                self.todoTable.reloadData()
+                
+                self.saveItems()
+                
             }
         }
         
@@ -50,12 +48,16 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         
+//        print(dataFilePath)
+        
         todoTable.delegate = self
         todoTable.dataSource = self
         
         fillArray()
         //First - use user defaults and load data from them
 //        loadDataFromUserDefaults()
+        //Second - use file and encodable/decodable class to load
+        loadDataFromFile()
     }
 //MARK: - tableView DataSsource methods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -74,7 +76,7 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
         itemArray[indexPath.row].checked = !itemArray[indexPath.row].checked
-        tableView.reloadData()
+        saveItems()
         tableView.deselectRow(at: indexPath, animated: true)
         
     }
@@ -84,6 +86,8 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
 //        guard let loadedData = defaults.array(forKey: "TodoListArray") as? [String] else { return }
 //        itemArray = loadedData
     }
+    
+   
     
     private func addItem(name: String){
         let newItem = Item(name: name)
@@ -110,6 +114,29 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
         addItem(name: "3")
         addItem(name: "4")
         addItem(name: "5")
+
+    }
+    //MARK: Load data from file (decodable class required)
+       private func loadDataFromFile(){
+           if let data = try? Data(contentsOf: dataFilePath!) {
+               let decoder = PropertyListDecoder()
+               do {
+                   itemArray = try decoder.decode([Item].self, from: data)
+               } catch {
+                   print("Error while loading \(error)")
+               }
+           }
+       }
+    //MARK: - Save data to file
+    private func saveItems(){
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array \(error)")
+        }
+        todoTable.reloadData()
 
     }
 }
