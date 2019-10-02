@@ -7,13 +7,24 @@
 //
 
 import UIKit
+import CoreData
 
-class ToDoListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ToDoListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
     
     var itemArray = [Item]()
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
-
+    var selectedCategory : Categories? {
+        didSet {
+            loadItems()
+        }
+    }
+    
+//    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     @IBOutlet weak var todoTable: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     
     //MARK: - IBActions
     @IBAction func clickAddButton(_ sender: UIBarButtonItem) {
@@ -25,8 +36,13 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
             //what will happen
             guard let newItemName = textField.text else { return }
             if newItemName.count > 0 {
-                let newItem = Item(name: newItemName, checked: false)
-                self.itemArray.append(newItem)
+                let newItem = Item(context: self.context)
+                newItem.name = newItemName
+                newItem.checked = false
+                newItem.parentCategory = self.selectedCategory
+                
+//                self.itemArray.append(newItem)
+                self.itemArray.insert(newItem, at: 0)
                 
                 self.saveItems()
                 
@@ -49,15 +65,19 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         
 //        print(dataFilePath)
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         todoTable.delegate = self
         todoTable.dataSource = self
+        searchBar.delegate = self
         
-        fillArray()
+//        fillArray()
         //First - use user defaults and load data from them
 //        loadDataFromUserDefaults()
         //Second - use file and encodable/decodable class to load
-        loadDataFromFile()
+//        loadDataFromFile()
+        //Third - use CoreData
+//        loadItems()
     }
 //MARK: - tableView DataSsource methods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -71,8 +91,15 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
         cell.accessoryType =  item.checked ? .checkmark : .none
         return cell
     }
-    
-  //MARK: - tableView Delegate methods
+  
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            deleteItem(index: indexPath.row)
+        } else if editingStyle == .insert {
+            
+        }
+    }
+    //MARK: - tableView Delegate methods
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
         itemArray[indexPath.row].checked = !itemArray[indexPath.row].checked
@@ -81,63 +108,109 @@ class ToDoListViewController: UIViewController, UITableViewDelegate, UITableView
         
     }
     
+    
     //MARK: - Load data from user defaults
     private func loadDataFromUserDefaults(){
 //        guard let loadedData = defaults.array(forKey: "TodoListArray") as? [String] else { return }
 //        itemArray = loadedData
     }
     
-   
     
-    private func addItem(name: String){
-        let newItem = Item(name: name)
-        itemArray.append(newItem)
-    }
+    //MARK: - Data manipulating methods
     
-    //MARK: - Default initializations for test
-    private func fillArray(){
-        addItem(name: "Milk")
-        addItem(name: "Water")
-        addItem(name: "Cola")
-        addItem(name: "Meat")
-        addItem(name: "Orange")
-        addItem(name: "Cucumber")
-        addItem(name: "Candies")
-        addItem(name: "Juice")
-        addItem(name: "Potato")
-        addItem(name: "Tomato")
-        addItem(name: "Bread")
-        addItem(name: "Eggs")
-        addItem(name: "Apples")
-        addItem(name: "1")
-        addItem(name: "2")
-        addItem(name: "3")
-        addItem(name: "4")
-        addItem(name: "5")
-
-    }
-    //MARK: Load data from file (decodable class required)
+    //Load data from file (decodable class required)
        private func loadDataFromFile(){
-           if let data = try? Data(contentsOf: dataFilePath!) {
-               let decoder = PropertyListDecoder()
-               do {
-                   itemArray = try decoder.decode([Item].self, from: data)
-               } catch {
-                   print("Error while loading \(error)")
-               }
-           }
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([Item].self, from: data)
+//            } catch {
+//                print("Error while loading \(error)")
+//            }
+//        }
+
        }
-    //MARK: - Save data to file
-    private func saveItems(){
-        let encoder = PropertyListEncoder()
+    //Load data from context
+    private func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(),
+                           predicate: NSPredicate? = nil){
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        guard let category = selectedCategory, let categoryName = category.name  else { return }
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", categoryName)
+        
+        var compoundPredicate: NSCompoundPredicate
+        if let additionPredicate = predicate {
+            compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionPredicate])
+        } else {
+            compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate])
+        }
+        
+        
+        request.predicate = compoundPredicate
+        request.sortDescriptors = [NSSortDescriptor(key: "checked", ascending: true), NSSortDescriptor(key: "name", ascending: true)]
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            itemArray = try  context.fetch(request)
         } catch {
-            print("Error encoding item array \(error)")
+            print("Error fetching data from context \(error)")
+        }
+        
+        if let table = todoTable {
+            table.reloadData()
+        }
+    }
+    
+    //Save data to context
+    private func saveItems(){
+        do {
+            try context.save()
+        } catch {
+            print("Error while saving \(error)")
         }
         todoTable.reloadData()
 
     }
+    
+    //Delete data from context
+    private func deleteItem(index: Int){
+        context.delete(itemArray[index])
+        itemArray.remove(at: index)
+        saveItems()
+        
+        todoTable.reloadData()
+    }
 }
+    //MARK: - Search bar  methods
+extension ToDoListViewController: UISearchBarDelegate {
 
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if let searchText = searchBar.text, searchText.count > 0 {
+            applyFilter(with: searchText)
+        } else {
+            loadItems()
+        }
+        
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            //HIDE KEYBOARD AND CHANGE FOCUS FROM SEARCH BAR
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+                
+            }
+        }
+    }
+    
+    func applyFilter(with searchText: String){
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        let predicate = NSPredicate(format: "name CONTAINS[cd] %@", searchText)
+        
+        
+        loadItems(with: request, predicate: predicate)
+        
+    }
+    
+    
+    
+}

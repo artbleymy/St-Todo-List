@@ -7,7 +7,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--St Todo List-->
+        <!--Items-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ToDoListViewController" customModule="St_Todo_List" customModuleProvider="target" sceneMemberID="viewController">
@@ -18,9 +18,14 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="hbL-j7-lfX">
                                 <rect key="frame" x="0.0" y="44" width="375" height="623"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <searchBar key="tableHeaderView" contentMode="redraw" id="4Hl-UC-Cas">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                    <textInputTraits key="textInputTraits"/>
+                                </searchBar>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="itemCell" id="NAh-ME-31h">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="72" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="NAh-ME-31h" id="2Fs-IE-ggj">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -39,20 +44,22 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" title="St Todo List" id="7r7-Zw-WwI">
+                    <navigationItem key="navigationItem" title="Items" id="7r7-Zw-WwI">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Uwt-g9-01u">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
                                 <action selector="clickAddButton:" destination="BYZ-38-t0r" id="YuI-VJ-CFr"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="searchBar" destination="4Hl-UC-Cas" id="1tr-th-LMj"/>
                         <outlet property="todoTable" destination="hbL-j7-lfX" id="Y8y-FK-lEk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1077.5999999999999" y="137.18140929535232"/>
+            <point key="canvasLocation" x="1602" y="137"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="L6G-UK-lXM">
@@ -66,12 +73,61 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="ZTz-Xw-KK7"/>
+                        <segue destination="WEN-4H-Am4" kind="relationship" relationship="rootViewController" id="I4k-Tw-sNw"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OzB-M1-gHQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="138.40000000000001" y="137.18140929535232"/>
+        </scene>
+        <!--St Todo List-->
+        <scene sceneID="9D4-0G-Zq0">
+            <objects>
+                <viewController id="WEN-4H-Am4" customClass="CategoryViewController" customModule="St_Todo_List" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Qbc-1W-dHo">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="20A-dK-m5c">
+                                <rect key="frame" x="0.0" y="44" width="375" height="623"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="categoryCell" id="U0D-go-lGR">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="U0D-go-lGR" id="etN-Ol-D7z">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="20A-dK-m5c" firstAttribute="top" secondItem="ACW-yf-4BU" secondAttribute="top" id="88X-w9-5Qg"/>
+                            <constraint firstItem="20A-dK-m5c" firstAttribute="bottom" secondItem="ACW-yf-4BU" secondAttribute="bottom" id="A6T-XH-erh"/>
+                            <constraint firstItem="20A-dK-m5c" firstAttribute="leading" secondItem="ACW-yf-4BU" secondAttribute="leading" id="U7O-5b-hCl"/>
+                            <constraint firstItem="20A-dK-m5c" firstAttribute="trailing" secondItem="ACW-yf-4BU" secondAttribute="trailing" id="s5U-xr-csP"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ACW-yf-4BU"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="St Todo List" id="abr-XQ-uky">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="ThT-0L-oUj">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addCategory:" destination="WEN-4H-Am4" id="Y1f-L7-5q4"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="categoryTable" destination="20A-dK-m5c" id="dXs-QV-OVw"/>
+                        <segue destination="BYZ-38-t0r" kind="show" identifier="goToItems" id="rFH-lb-ewI"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Vbf-Vj-4Ps" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="852" y="136.28185907046478"/>
         </scene>
     </scenes>
 </document>
